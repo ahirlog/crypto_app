@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:crypto_app/features/home/presentation/providers/coin_details_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,9 +29,18 @@ class _CoinDetailScreenState extends ConsumerState<CoinDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final coinDetailsState = ref.watch(coinDetailsProvider);
+    final coinState = ref.watch(coinDetailsProvider);
     final historicalDataState = ref.watch(historicalDataProvider);
     final isFavorite = ref.watch(favoritesProvider).contains(widget.coinId);
+
+    // Add debug logging for historical data
+    historicalDataState.whenData((data) {
+      log('DEBUG: Historical data in UI: ${data.runtimeType}');
+      if (data.isNotEmpty) {
+        log('DEBUG: First item type: ${data.first.runtimeType}');
+        log('DEBUG: First item: ${data.first}');
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -54,7 +64,7 @@ class _CoinDetailScreenState extends ConsumerState<CoinDetailScreen> {
           ),
         ],
       ),
-      body: coinDetailsState.when(
+      body: coinState.when(
         data: (coin) {
           if (coin == null) {
             return const Center(child: Text('Coin not found'));

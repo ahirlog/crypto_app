@@ -17,6 +17,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   TextEditingController searchController = TextEditingController();
   String searchQuery = '';
 
+  // Add a test function to debug API responses
+  void _testApiResponses() async {
+    log('DEBUG: Testing API responses');
+    try {
+      // Test the getAllCoins method
+      log('DEBUG: Testing getAllCoins');
+      await ref.read(coinRemoteDataSourceProvider).getAllCoins();
+      
+      // Test the getCoinDetails method if we have a sample coin ID (using BTC as an example)
+      log('DEBUG: Testing getCoinDetails');
+      await ref.read(coinRemoteDataSourceProvider).getCoinDetails('BTC');
+      
+      // Test the getCoinHistoricalData method
+      log('DEBUG: Testing getCoinHistoricalData');
+      final histData = await ref.read(coinRemoteDataSourceProvider).getCoinHistoricalData('BTC', '1D');
+      log('DEBUG: Historical data type: ${histData.runtimeType}');
+      
+      // If we got here, all methods ran without crashing
+      log('DEBUG: All API methods completed successfully');
+    } catch (e, stackTrace) {
+      log('DEBUG ERROR: $e');
+      log(stackTrace.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final coinsState = ref.watch(coinListProvider);
@@ -26,6 +51,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         title: const Text('Crypto Tracker'),
         actions: [
+          // Add a debug button
+          IconButton(
+            icon: const Icon(Icons.bug_report),
+            onPressed: _testApiResponses,
+            tooltip: 'Debug API',
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
